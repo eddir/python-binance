@@ -41,12 +41,16 @@ class ThreadedApiManager(threading.Thread):
 
     async def start_listener(self, socket, path: str, callback):
         async with socket as s:
+            i = 0
             while self._socket_running[path]:
                 try:
+                    i += 1
                     msg = await asyncio.wait_for(s.recv(), 3)
                 except asyncio.TimeoutError:
-                    ...
-                    continue
+                    if i < 10:
+                        continue
+                    else:
+                        raise Exception("Too many Timeout errors.")
                 if not msg:
                     continue
                 callback(msg)
