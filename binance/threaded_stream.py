@@ -47,9 +47,9 @@ class ThreadedApiManager(threading.Thread):
             while self._socket_running[path]:
                 try:
                     i += 1
-                    log.debug("Wait for socket reply")
+                    log.info("Wait for socket reply")
                     msg = await asyncio.wait_for(s.recv(), 3)
-                    log.debug("Socket reply received")
+                    log.info("Socket reply received")
                 except asyncio.TimeoutError:
                     if i < 10:
                         continue
