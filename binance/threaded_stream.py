@@ -41,7 +41,7 @@ class ThreadedApiManager(threading.Thread):
             await asyncio.sleep(0.2)
 
     async def start_listener(self, socket, path: str, callback):
-        log = logging.getLogger(__name__)
+        log = logging.getLogger('django')
         async with socket as s:
             i = 0
             while self._socket_running[path]:
