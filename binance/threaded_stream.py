@@ -1,6 +1,7 @@
 import asyncio
 import threading
 from typing import Optional, Dict
+import logging
 
 from .client import AsyncClient
 
@@ -40,12 +41,15 @@ class ThreadedApiManager(threading.Thread):
             await asyncio.sleep(0.2)
 
     async def start_listener(self, socket, path: str, callback):
+        log = logging.getLogger(__name__)
         async with socket as s:
             i = 0
             while self._socket_running[path]:
                 try:
                     i += 1
+                    log.debug("Wait for socket reply")
                     msg = await asyncio.wait_for(s.recv(), 3)
+                    log.debug("Socket reply received")
                 except asyncio.TimeoutError:
                     if i < 10:
                         continue
