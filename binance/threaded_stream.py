@@ -1,6 +1,7 @@
 import asyncio
 import threading
 from typing import Optional, Dict
+import logging
 
 from .client import AsyncClient
 
@@ -40,13 +41,20 @@ class ThreadedApiManager(threading.Thread):
             await asyncio.sleep(0.2)
 
     async def start_listener(self, socket, path: str, callback):
+        log = logging.getLogger('django')
         async with socket as s:
+            i = 0
             while self._socket_running[path]:
                 try:
+                    i += 1
+                    log.info("Wait for socket reply")
                     msg = await asyncio.wait_for(s.recv(), 3)
+                    log.info("Socket reply received")
                 except asyncio.TimeoutError:
-                    ...
-                    continue
+                    if i < 10:
+                        continue
+                    else:
+                        raise Exception("Too many Timeout errors.")
                 if not msg:
                     continue
                 callback(msg)
